@@ -64,17 +64,29 @@ class col:
 class SlotLeaderCheck:
     ### Get data from blockfrost.io APIs ###
     headers = {'content-type': 'application/json', 'project_id': BlockFrostId}
+    headers_armada ={'content-type': 'application/json'}
 
-    epochParam = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/epochs/latest/parameters", headers=headers)
+    epochParam = requests.get("https://nonce.armada-alliance.io/next", headers=headers_armada)
     json_data = epochParam.json()
-    epoch = epochParam.json().get("epoch") 
+    epoch = epochParam.json().get("epoch")
     eta0 = epochParam.json().get("nonce")
+
+    ErrorMsg = "Query returned no rows"
+    if ErrorMsg in eta0 :
+        print(col.bold + col.red + f'New Nonce Not Avaliable Yet for Epoch: '+ col.endcl + col.bold + str(epoch))
+        print(col.endcl)
+        print(col.bold + col.red + f'Calculating for current Epoch: '+ col.endcl + col.bold + str(epoch-1))
+        print(col.endcl)
+        epochParam = requests.get("https://nonce.armada-alliance.io/current", headers=headers_armada)
+        json_data = epochParam.json()
+        epoch = epochParam.json().get("epoch")
+        eta0 = epochParam.json().get("nonce")
 
     poolSigma = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/pools/"+PoolId, headers=headers)
     json_data = poolSigma.json()
     sigma = poolSigma.json().get("active_size")
 
-    netStakeParam = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/epochs/latest", headers=headers)
+    netStakeParam = requests.get("https://cardano-mainnet.blockfrost.io/api/v0/epochs/"+(str(epoch-1)), headers=headers)
     json_data = netStakeParam.json()
     nStake = int(netStakeParam.json().get("active_stake")) / lovelaces
     nStake = "{:,}".format(nStake)

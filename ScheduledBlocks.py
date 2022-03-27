@@ -73,10 +73,6 @@ class SlotLeaderCheck:
 
     ErrorMsg = "Query returned no rows"
     if ErrorMsg in eta0 :
-        print(col.bold + col.red + f'New Nonce Not Avaliable Yet for Epoch: '+ col.endcl + col.bold + str(epoch))
-        print(col.endcl)
-        print(col.bold + col.red + f'Calculating for current Epoch: '+ col.endcl + col.bold + str(epoch-1))
-        print(col.endcl)
         epochParam = requests.get("https://nonce.armada-alliance.io/current", headers=headers_armada)
         json_data = epochParam.json()
         epoch = epochParam.json().get("epoch")
